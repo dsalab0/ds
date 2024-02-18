@@ -1,0 +1,175 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct node {
+    char ssn[25], name[25], dept[10], designation[25];
+    int sal;
+    long int phone;
+    struct node *llink;
+    struct node *rlink;
+};
+typedef struct node* NODE;
+NODE first = NULL;
+int count = 0;
+NODE create() {
+    NODE enode = (NODE)malloc(sizeof(struct node));
+    if (enode == NULL) {
+        printf("\nRunning out of memory");
+        exit(0);
+    }
+    printf("\nEnter the SSN, Name, Department, Designation, Salary, Phone number of the employee: \n");
+    scanf("%s %s %s %s %d %ld", enode->ssn, enode->name, enode->dept, enode->designation, &enode->sal, &enode->phone);
+    enode->llink = NULL;
+    enode->rlink = NULL;
+    count++;
+    return enode;
+}
+void display() {
+    NODE cur = first;
+    int nodeno = 1;
+    if (cur == NULL) {
+        printf("\nNo contents to display in DLL\n");
+        return;
+    }
+    printf("\nContents of the doubly linked list:\n");
+    while (cur != NULL) {
+        printf("\nENode:%d||SSN:%s|Name:%s|Department:%s|Designation:%s|Salary:%d|Phone no:%ld", nodeno, cur->ssn, cur->name, cur->dept, cur->designation, cur->sal, cur->phone);
+        cur = cur->rlink;
+        nodeno++;
+    }
+    printf("\nNo of employee nodes is %d\n", count);
+}
+void insertFront() {
+    NODE temp = create();
+    temp->rlink = first;
+    if (first != NULL)
+        first->llink = temp;
+    first = temp;
+}
+void deleteFront() {
+    NODE temp;
+    if (first == NULL) {
+        printf("\nDoubly Linked List is empty\n");
+        return;
+    }
+    if (first->rlink == NULL) {
+        printf("\nThe employee node with the SSN:%s is deleted\n", first->ssn);
+        free(first);
+        count--;
+        first = NULL;
+        return;
+    }
+    temp = first;
+    first = first->rlink;
+    first->llink = NULL;
+    printf("\nThe employee node with the SSN:%s is deleted\n", temp->ssn);
+    free(temp);
+     count--;
+}
+void insertEnd() {
+    NODE temp = create();
+    NODE cur = first;
+    if (first == NULL) {
+        first = temp;
+        return;
+    }
+    while (cur->rlink != NULL)
+        cur = cur->rlink;
+    cur->rlink = temp;
+    temp->llink = cur;
+}
+void deleteEnd() {
+    NODE prev = NULL, cur = first;
+    if (first == NULL) {
+        printf("\nDoubly Linked List is empty\n");
+        return;
+    }
+    if (first->rlink == NULL) {
+        printf("\nThe employee node with the SSN:%s is deleted\n", first->ssn);
+        free(first);
+        count--;
+        first = NULL;
+        return;
+    }
+    while (cur->rlink != NULL) {
+        prev = cur;
+        cur = cur->rlink;
+    }
+    prev->rlink = NULL;
+    printf("\nThe employee node with the SSN:%s is deleted\n", cur->ssn);
+    free(cur);
+    count--;
+}
+void deqDemo() {
+    int ch;
+    while(1) {
+        printf("\nDemo Double Ended Queue Operation");
+        printf("\n1:InsertQueueFront\n2:DeleteQueueFront\n3:InsertQueueRear\n4:DeleteQueueRear\n5:DisplayStatus\n6:Exit\n");
+        scanf("%d", &ch);
+        switch(ch) {
+            case 1: 
+                insertFront();
+                break;
+            case 2: 
+                deleteFront();
+                break;
+            case 3: 
+                insertEnd();
+                break;
+            case 4: 
+                deleteEnd();
+                break;
+            case 5: 
+                display();
+                break;
+            default: 
+                return;
+        }
+    }
+}
+int main() {
+    int ch, n, i;
+    while(1) {
+        printf("\n\n~~~Menu~~~");
+        printf("\n1:Create DLL of Employee Nodes");
+        printf("\n2:Display Status");
+        printf("\n3:Insert At End");
+        printf("\n4:Delete At End");
+        printf("\n5:Insert At Front");
+        printf("\n6:Delete At Front");
+        printf("\n7:Double Ended Queue Demo using DLL");
+        printf("\n8:Exit\n");
+        printf("\nPlease enter your choice: ");
+        scanf("%d", &ch);
+        switch(ch) {
+            case 1: 
+                printf("\nEnter the number of employees: ");
+                scanf("%d", &n);
+                for (i = 0; i < n; i++)
+                    insertEnd();
+                break;
+            case 2: 
+                display();
+                break;
+            case 3: 
+                insertEnd();
+                break;
+            case 4: 
+                deleteEnd();
+                break;
+            case 5: 
+                insertFront();
+                break;
+            case 6: 
+                deleteFront();
+                break;
+            case 7: 
+                deqDemo();
+                break;
+            case 8: 
+                exit(0);
+            default: 
+                printf("\nPlease enter a valid choice\n");
+        }
+    }
+    return 0;
+}

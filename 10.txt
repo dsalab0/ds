@@ -1,0 +1,168 @@
+#include<stdio.h>
+#include<stdlib.h>
+typedef struct node {
+    int data;
+    struct node *left, *right;
+    int ht;
+} node;
+node *insert(node *, int);
+node *Delete(node *, int);
+void preorder(node *);
+void inorder(node *);
+int height(node *);
+node *rotateright(node *);
+node *rotateleft(node *);
+node *RR(node *);
+node *LL(node *);
+node *LR(node *);
+node *RL(node *);
+int BF(node *);
+void printMenu();
+int main() {
+    node *root = NULL;
+    int x, op;
+    do {
+        printMenu();
+        scanf("%d", &op);
+        switch (op) {
+            case 1: {
+                printf("Enter Total Number of Elements in the AVL Tree: ");
+                int n;
+                scanf("%d", &n);
+                printf("Enter AVL Tree Elements: ");
+                root = NULL;
+                for (int i = 0; i < n; i++) {
+                    scanf("%d", &x);
+                    root = insert(root, x);
+                }
+                break;
+            }
+            case 2: {
+                printf("Enter an Element to Insert in the AVL Tree: ");
+                scanf("%d", &x);
+                root = insert(root, x);
+                break;
+            }
+            case 3: {
+                printf("Enter an Element to Delete from the AVL Tree: ");
+                scanf("%d", &x);
+                root = Delete(root, x);
+                break;
+            }
+            case 4: {
+                printf("Preorder Sequence of the AVL Tree:\n");
+                preorder(root);
+                printf("\nInorder sequence of the AVL Tree:\n");
+                inorder(root);
+                break;
+            }
+        }
+    } while (op != 5);
+    return 0;
+}
+node *insert(node *T, int x) {
+    if (T == NULL) {
+        T = (node *) malloc(sizeof(node));
+        T->data = x;
+        T->left = NULL;
+        T->right = NULL;
+    } else if (x > T->data) {
+        T->right = insert(T->right, x);
+        if (BF(T) == -2)
+            T = (x > T->right->data) ? RR(T) : RL(T);
+    } else if (x < T->data) {
+        T->left = insert(T->left, x);
+        if (BF(T) == 2)
+            T = (x < T->left->data) ? LL(T) : LR(T);
+    }
+    T->ht = height(T);
+    return T;
+}
+node *Delete(node *T, int x) {
+    if (T == NULL) return NULL;
+    if (x > T->data) {
+        T->right = Delete(T->right, x);
+        if (BF(T) == 2)
+            T = (BF(T->left) >= 0) ? LL(T) : LR(T);
+    } else if (x < T->data) {
+        T->left = Delete(T->left, x);
+        if (BF(T) == -2)
+            T = (BF(T->right) <= 0) ? RR(T) : RL(T);
+    } else {
+        if (T->right != NULL) {
+            node *p = T->right;
+            while (p->left != NULL) p = p->left;
+            T->data = p->data;
+            T->right = Delete(T->right, p->data);
+            if (BF(T) == 2)
+                T = (BF(T->left) >= 0) ? LL(T) : LR(T);
+        } else
+            return T->left;
+    }
+    T->ht = height(T);
+    return T;
+}
+int height(node *T) {
+    if (T == NULL) return 0;
+    int lh = (T->left == NULL) ? 0 : 1 + T->left->ht;
+    int rh = (T->right == NULL) ? 0 : 1 + T->right->ht;
+    return (lh > rh) ? lh : rh;
+}
+node *rotateright(node *x) {
+    node *y = x->left;
+    x->left = y->right;
+    y->right = x;
+    x->ht = height(x);
+    y->ht = height(y);
+    return y;
+}
+node *rotateleft(node *x) {
+    node *y = x->right;
+    x->right = y->left;
+    y->left = x;
+    x->ht = height(x);
+    y->ht = height(y);
+    return y;
+}
+node *RR(node *T) {
+    return rotateleft(T);
+}
+node *LL(node *T) {
+    return rotateright(T);
+}
+node *LR(node *T) {
+    T->left = rotateleft(T->left);
+    return rotateright(T);
+}
+node *RL(node *T) {
+    T->right = rotateright(T->right);
+    return rotateleft(T);
+}
+int BF(node *T) {
+    if (T == NULL) return 0;
+    int lh = (T->left == NULL) ? 0 : 1 + T->left->ht;
+    int rh = (T->right == NULL) ? 0 : 1 + T->right->ht;
+    return lh - rh;
+}
+void preorder(node *T) {
+    if (T != NULL) {
+        printf("%d(Bf=%d) ", T->data, BF(T));
+        preorder(T->left);
+        preorder(T->right);
+    }
+}
+void inorder(node *T) {
+    if (T != NULL) {
+        inorder(T->left);
+        printf("%d(Bf=%d) ", T->data, BF(T));
+        inorder(T->right);
+    }
+}
+void printMenu() {
+    printf("\n1) Create the AVL Tree");
+    printf("\n2) Insert Element into the AVL Tree");
+    printf("\n3) Delete Element from the AVL Tree ");
+    printf("\n4) Print the AVL Tree");
+    printf("\n5) Quit");
+    printf("\nEnter Your Choice: ");
+}
